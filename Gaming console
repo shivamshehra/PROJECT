@@ -1,1 +1,101 @@
+// Code for gaming console using arduino pro mmicro and analog potention meter
 
+#include <Keyboard.h>
+const int sensorPin = A0;    // pin that the sensor is attached to
+
+// variables:
+int counter = 0;         // the sensor value
+int sensorMin = 1023;        // minimum sensor value
+int sensorMax = 0;           // maximum sensor value
+
+int i = 0; 
+
+int APin = 4;  // UP   
+int DPin = 5;  // UP   
+ 
+
+
+void setup()
+{
+
+  pinMode(APin, INPUT);
+  pinMode(DPin, INPUT);
+  
+  digitalWrite(APin, HIGH);
+  digitalWrite(DPin, HIGH);
+  Keyboard.begin();
+  
+}
+
+void loop()
+{
+  i=millis();
+  Serial.println(i);
+  Serial.println();
+  delayMicroseconds(100);
+ if(i>900)
+  {i=0;
+  }
+  counter = analogRead(sensorPin);
+
+  // apply the calibration to the sensor reading
+  counter = map(counter, sensorMin, sensorMax, 0, 255);
+
+  // in case the sensor value is outside the range seen during calibration
+  counter = constrain(counter, 0, 255);
+Serial.println(counter);
+ 
+if(counter>=120&&counter<=160)
+{
+ Serial.println(counter);
+  Serial.println("neutral");
+  Keyboard.release('d');
+Keyboard.release('a');}
+
+if(counter>160)
+{
+  Serial.println(counter);
+  Serial.println("right");
+ if(i<1)
+   { Keyboard.press('d');  
+   }
+   if(i>2&&i<900)      
+ {
+  Keyboard.release('d');
+ }
+}  
+  if(counter<120)
+  {
+  Serial.println(counter);
+  Serial.println("left");
+     if(i<1)
+ { Keyboard.press('a');  
+ }   if(i>2&&i<900)
+{
+  Keyboard.release('a');
+}
+  }
+  }
+/*  
+  if (digitalRead(WPin) == 0) 
+  {
+    Keyboard.press('w');  
+  } 
+  if(digitalRead(WPin) == 1)
+ {       
+Keyboard.release('w');
+  
+  }
+  
+
+if (digitalRead(SPin) == 0) 
+  {
+    Keyboard.press('s');  
+  } 
+  if(digitalRead(SPin) == 1)
+ {       
+Keyboard.release('S');
+  
+  }
+  
+*/
