@@ -1,1 +1,163 @@
 
+int RelayPin1 = 8;
+int RelayPin2 = 9;
+int RelayPin3 = 10;
+int RelayPin4 = 11;
+
+#include<LiquidCrystal.h>
+
+#include "ACS712.h"
+
+
+ACS712  ACS(A0, 5.0, 1023, 100);
+
+LiquidCrystal lcd(2, 3, 4, 5, 6, 7);  // sets the interfacing pins
+
+void setup()
+{
+ lcd.begin(16, 2);  // initializes the 16x2 LCD
+ Serial.begin(115200);
+  Serial.println(__FILE__);
+  ACS.autoMidPoint();
+ pinMode(RelayPin1, OUTPUT);
+   pinMode(RelayPin2, OUTPUT);
+   pinMode(RelayPin3, OUTPUT);
+   pinMode(RelayPin4, OUTPUT);
+  
+}
+
+void loop()
+{
+  lcd.setCursor(0,0);           //sets the cursor at row 0 column 0
+  lcd.print("POWER FACTOR "); // prints 16x2 LCD MODULE
+  lcd.setCursor(2,1);           //sets the cursor at row 1 column 2
+  lcd.print("CALCULATING");     // prints HELLO WORLD
+lcd.clear();
+  int mA = ACS.mA_AC();
+  Serial.println(mA);
+
+  if (Serial.available() > 0)
+  {
+    char c = Serial.read();
+
+    if (c == '*') ACS.setmVperAmp(ACS.getmVperAmp() + 1);
+    if (c == '/') ACS.setmVperAmp(ACS.getmVperAmp() - 1);
+    Serial.print("mVperAmp:\t");
+    Serial.println(ACS.getmVperAmp());
+
+    if (c == '+') ACS.setFormFactor(ACS.getFormFactor() * 1.05);
+    if (c == '-') ACS.setFormFactor(ACS.getFormFactor() / 1.05);
+    Serial.print("formFactor:\t");
+   // Serial.println(ACS.getFormFactor());
+ }
+ 
+   //Serial.println(a);
+delay(1000);
+  
+if(mA<150)
+{
+Serial.println("no load");
+
+ digitalWrite(RelayPin1, HIGH);
+digitalWrite(RelayPin2, HIGH);
+digitalWrite(RelayPin3, HIGH);
+digitalWrite(RelayPin4, HIGH);
+
+  lcd.setCursor(0,0);           //sets the cursor at row 0 column 0
+  lcd.print("NO LOAD ");
+  lcd.setCursor(2,1);           //sets the cursor at row 1 column 2
+  lcd.print(".......");
+delay(500);
+  }
+
+
+if(mA>150&&mA<240)
+{
+Serial.print("resistive load");
+
+digitalWrite(RelayPin1, HIGH);
+digitalWrite(RelayPin2, HIGH);
+digitalWrite(RelayPin3, HIGH);
+digitalWrite(RelayPin4, HIGH);
+
+lcd.clear();
+  lcd.setCursor(0,0);           //sets the cursor at row 0 column 0
+  lcd.print(" CALCULATING ");
+ delay(500);
+ lcd.clear();
+  lcd.setCursor(0,0);           //sets the cursor at row 0 column 0
+  lcd.print(" RESISTIVE LOAD ");
+  lcd.setCursor(2,1);           //sets the cursor at row 1 column 2
+  lcd.print("PF= .99");
+  delay(500);
+  }
+
+if(mA>240)
+{
+Serial.println("i load");
+ lcd.clear();
+  lcd.setCursor(0,0);           //sets the cursor at row 0 column 0
+  lcd.print(" CALCULATING ");
+delay(500);
+lcd.clear();
+  lcd.setCursor(0,0);           //sets the cursor at row 0 column 0
+  lcd.print("ILOAD ");
+  lcd.setCursor(2,1);           //sets the cursor at row 1 column 2
+  lcd.print("PF= .50");
+
+delay(500);
+lcd.clear();
+  lcd.setCursor(0,0);           //sets the cursor at row 0 column 0
+  lcd.print(" CALCULATING ");
+
+  digitalWrite(RelayPin1, LOW);
+Serial.println("i load");
+
+  delay(500);
+lcd.clear();
+ lcd.setCursor(0,0);           //sets the cursor at row 0 column 0
+  lcd.print("RELAY-1 ");
+Serial.println("R 1");
+
+lcd.clear();
+ delay(500);
+  lcd.setCursor(0,0);           //sets the cursor at row 0 column 0
+  lcd.print(" CALCULATING ");
+
+  lcd.setCursor(2,1);           //sets the cursor at row 1 column 2
+  lcd.print("PF= .80");
+  delay(500);
+lcd.clear();
+delay(500);
+
+  lcd.clear();
+  lcd.setCursor(0,0);           //sets the cursor at row 0 column 0
+  lcd.print(" CALCULATING ");
+delay(500);
+  lcd.clear();
+  digitalWrite(RelayPin2, LOW);
+  delay(500);
+  lcd.setCursor(0,0);           //sets the cursor at row 0 column 0
+  lcd.print("REALY-2 ");
+  Serial.println("R 2");
+  delay(500);
+  lcd.setCursor(2,1);           //sets the cursor at row 1 column 2
+  lcd.print("PF= .92");
+   delay(500);
+
+  lcd.clear();
+  lcd.setCursor(0,0);           //sets the cursor at row 0 column 0
+  lcd.print(" CALCULATING ");
+delay(500);
+lcd.clear();
+digitalWrite(RelayPin3, LOW);
+  lcd.setCursor(0,0);           //sets the cursor at row 0 column 0
+delay(500);
+  lcd.print("RELAY-3 ");
+  Serial.println("R 3");
+  lcd.setCursor(2,1);           //sets the cursor at row 1 column 2
+  lcd.print("PF= .98");
+ // delay(4000);
+}
+}
+
